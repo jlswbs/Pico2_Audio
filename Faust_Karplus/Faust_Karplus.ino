@@ -53,13 +53,13 @@ void loop(){
 void loop1(){
 
   dsp->fHslider0 = randomf(0.01f, 0.3f); // damp 0..1
-  dsp->fHslider1 = randomf(0.2f, 0.99f); // tune 0..1
-  dsp->fHslider2 = randomf(0.2f, 0.99f); // gain 0..1
+  dsp->fHslider1 = randomf(0.2f, 1.99f); // tune 0..2
+  dsp->fHslider2 = randomf(0.4f, 0.99f); // gain 0..1
   dsp->fButton0 = 1.0f; // gate on
 
   delay(10);
 
-  dsp->fButton0 = 0.0f;
+  dsp->fButton0 = 0.0f; // gate off
 
   delay(230);
 

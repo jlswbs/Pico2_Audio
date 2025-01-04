@@ -198,9 +198,8 @@ void computemydsp(mydsp* dsp, int count, FAUSTFLOAT** RESTRICT inputs, FAUSTFLOA
 			dsp->fRec0[0] = fRec4;
 			dsp->fRec1[0] = fRec5;
 			float fRec2 = fRec6;
-			float fTemp6 = 0.5f * fRec2;
-			output0[i0] = (FAUSTFLOAT)(fTemp6);
-			output1[i0] = (FAUSTFLOAT)(fTemp6);
+			output0[i0] = (FAUSTFLOAT)(fRec2);
+			output1[i0] = (FAUSTFLOAT)(fRec2);
 			dsp->IOTA0 = dsp->IOTA0 + 1;
 			dsp->fVec0[1] = dsp->fVec0[0];
 			dsp->fRec3[1] = dsp->fRec3[0];

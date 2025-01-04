@@ -1,4 +1,4 @@
-//  Faust DSP - Djembe random //
+//  Faust DSP - Djembe //
 
 #include <I2S.h>
 #include "djembe.h"
@@ -8,6 +8,8 @@
 #define I2S_BUFFERS   4
 #define I2S_WORDS     64
 #define SAMPLE_RATE   48000
+
+float randomf(float minf, float maxf) {return minf + (rand()%(1UL << 31))*(maxf - minf) / (1UL << 31);}
 
   I2S i2s_output(OUTPUT);
   mydsp* dsp;
@@ -45,5 +47,21 @@ void loop(){
     i2s_output.write16(left_buffer[i], right_buffer[i]);
 
   }
+
+}
+
+void loop1(){
+
+  dsp->fHslider0 = random(55, 440); // frequency hz
+  dsp->fHslider1 = randomf(0.1f, 0.99f); // sharpness 0..1
+  dsp->fHslider2 = randomf(0.1f, 0.99f); // position 0..1
+  dsp->fHslider3 = randomf(0.4f, 0.99f); // gain 0..1
+  dsp->fButton0 = 1.0f; // gate on
+
+  delay(10);
+
+  dsp->fButton0 = 0.0f; // gate off
+
+  delay(230);
 
 }

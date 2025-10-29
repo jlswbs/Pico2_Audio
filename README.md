@@ -4,6 +4,6 @@
 
 
 - - Apalis = simple derivation of MutableInstruments
-  - FAUST = Faust dsp language converted to c++
+  - Faust = Faust dsp language converted to c++
   - DSP = some native DSP experiments
   - PD = PureData patches converted to c++

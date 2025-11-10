@@ -131,6 +131,12 @@ void loop() {
 
 }
 
+void setup1() {
+
+  seed_random_safe();
+
+}
+
 void loop1() {
 
   float freqTable[] = {110.0f, 146.8f, 196.0f, 246.9f, 329.6f, 392.0f, 440.0f, 523.3f};

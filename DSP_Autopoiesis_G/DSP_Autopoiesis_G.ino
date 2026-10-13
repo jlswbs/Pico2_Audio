@@ -11,7 +11,7 @@
 
 #define RNN_TAPS       5
 #define NUM_NEURONS    12
-#define NOISE_BURST    16
+#define NOISE_BURST    32
 
 I2S i2s_output(OUTPUT);
 
@@ -162,8 +162,8 @@ void loop() {
     for (int j = RNN_TAPS - 1; j > 0; j--) feedback_L2[j] = feedback_L2[j-1];
     feedback_L2[0] = out_L2;
 
-    int16_t sampleL = (int16_t)(last_outputs[0] * 8192.0f);
-    int16_t sampleR = (int16_t)(last_outputs[NUM_NEURONS / 2] * 8192.0f);
+    int16_t sampleL = (int16_t)(last_outputs[0] * 4096.0f);
+    int16_t sampleR = (int16_t)(last_outputs[NUM_NEURONS / 2] * 4096.0f);
 
     i2s_output.write16(sampleL, sampleR);
 

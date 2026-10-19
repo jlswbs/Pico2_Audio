@@ -11,7 +11,7 @@
 
 #define RNN_TAPS       5
 #define NUM_NEURONS    10
-#define NOISE_BURST    16
+#define NOISE_BURST    12
 
 I2S i2s_output(OUTPUT);
 
@@ -42,13 +42,28 @@ int half_neurons = NUM_NEURONS / 2;
 float norm_L = 1.0f / (float)half_neurons;
 float norm_R = 1.0f / (float)(NUM_NEURONS - half_neurons);
 
-float randomf(float min, float max) { return min + (max - min) * ((float)rand() / (float)RAND_MAX); }
+uint32_t fast_seed = 0;
 
-static inline float fast_tanhf(float x) {
+static inline float dsp_noise() {
 
-  if (x >= 3.0f) return 1.0f;
-  if (x <= -3.0f) return -1.0f;
-  return x * (27.0f + x * x) / (27.0f + 9.0f * x * x);
+  uint32_t x = fast_seed;
+  x ^= x << 13;
+  x ^= x >> 17;
+  x ^= x << 5;
+  fast_seed = x;
+  return (float)(int32_t)x * (1.0f / 2147483648.0f);
+
+}
+
+float randomf(float min, float max) { return min + (max - min) * (0.5f * dsp_noise() + 0.5f); }
+
+float dsp_clamp(float x, float lo, float hi) { return x < lo ? lo : x > hi ? hi : x; }
+
+float dsp_tanh(float x) {
+
+  x = dsp_clamp(x, -3.0f, 3.0f);
+  float x2 = x * x;
+  return x * (27.0f + x2) / (27.0f + 9.0f * x2);
 
 }
 
@@ -117,6 +132,8 @@ void setup() {
   i2s_output.setBuffers(I2S_BUFFERS, I2S_WORDS);
   i2s_output.begin();
 
+  fast_seed = rand();
+
   for (int n = 0; n < NUM_NEURONS; n++) {
     last_outputs[n] = 0;
     for (int i = 0; i < RNN_TAPS; i++) {
@@ -172,7 +189,7 @@ void loop() {
       }
 
       if (noise_timer_local[n] > 0) {
-        excitation[n] = randomf(-1.0f, 1.0f) * env_local[n];
+        excitation[n] = randomf(-0.5f, 0.5f) * env_local[n];
         env_local[n] *= 0.85f;
         noise_timer_local[n]--;
       } else {
@@ -197,7 +214,7 @@ void loop() {
         sum += last_outputs[m] * weights_Inter[n][m];
       }
       
-      float target_out = fast_tanhf(excitation[n] + sum);
+      float target_out = dsp_tanh(excitation[n] + sum);
       float out_n = last_outputs[n] + neuron_alpha[n] * (target_out - last_outputs[n]);
 
       for (int j = RNN_TAPS - 1; j > 0; j--) feedback_L1[n][j] = feedback_L1[n][j-1];
@@ -220,7 +237,7 @@ void loop() {
       sum2 += feedback_L2[j] * weights_L2[j];
     }
     
-    float out_L2 = fast_tanhf(((l1_left + l1_right) * 0.5f) + sum2);
+    float out_L2 = dsp_tanh(((l1_left + l1_right) * 0.5f) + sum2);
     
     for (int j = RNN_TAPS - 1; j > 0; j--) feedback_L2[j] = feedback_L2[j-1];
     feedback_L2[0] = out_L2;
@@ -237,6 +254,8 @@ void loop() {
 void setup1() {
 
   seed_random_safe();
+
+  fast_seed = rand();
 
 }
 
